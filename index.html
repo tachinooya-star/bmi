@@ -16,11 +16,14 @@
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            flex: 1;
         }
         
         header {
@@ -263,6 +266,21 @@
             background-color: #e6f2ff;
         }
         
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .credit {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
@@ -361,6 +379,10 @@
             </div>
         </div>
     </div>
+
+    <footer>
+        <div class="credit">Development by Tachin Oya</div>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
