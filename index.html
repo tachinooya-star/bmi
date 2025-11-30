@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องคำนวณ BMI พร้อมบันทึกข้อมูล</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .calculator-section, .records-section {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .calculator-section {
+            max-width: 500px;
+        }
+        
+        .records-section {
+            max-width: 600px;
+        }
+        
+        .section-title {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #2575fc;
+            outline: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .primary-btn {
+            background-color: #2575fc;
+            color: white;
+        }
+        
+        .primary-btn:hover {
+            background-color: #1a67e8;
+        }
+        
+        .secondary-btn {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .secondary-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .danger-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .danger-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            background-color: #f9f9f9;
+        }
+        
+        .bmi-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .bmi-category {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .bmi-info {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .records-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .record-item {
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .record-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .record-info {
+            flex: 1;
+        }
+        
+        .record-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .record-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .record-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .edit-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .no-records {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+            font-style: italic;
+        }
+        
+        .bmi-table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        
+        .bmi-table th, .bmi-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .bmi-table th {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #e6f2ff;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .calculator-section, .records-section {
+                max-width: 100%;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>เครื่องคำนวณดัชนีมวลกาย (BMI)</h1>
+            <p class="description">คำนวณค่า BMI และบันทึกประวัติการคำนวณของคุณ พร้อมระบบจัดการข้อมูลส่วนตัว</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="calculator-section">
+                <h2 class="section-title">คำนวณ BMI</h2>
+                
+                <div class="input-group">
+                    <label for="name">ชื่อ</label>
+                    <input type="text" id="name" placeholder="กรุณากรอกชื่อของคุณ">
+                </div>
+                
+                <div class="input-group">
+                    <label for="height">ส่วนสูง (เซนติเมตร)</label>
+                    <input type="number" id="height" placeholder="กรุณากรอกส่วนสูง" min="1" max="300">
+                </div>
+                
+                <div class="input-group">
+                    <label for="weight">น้ำหนัก (กิโลกรัม)</label>
+                    <input type="number" id="weight" placeholder="กรุณากรอกน้ำหนัก" min="1" max="500">
+                </div>
+                
+                <div class="button-group">
+                    <button id="calculate" class="primary-btn">คำนวณ BMI</button>
+                    <button id="reset" class="secondary-btn">รีเซ็ต</button>
+                </div>
+                
+                <div class="result" id="result">
+                    <h2>ผลลัพธ์ BMI ของคุณ</h2>
+                    <div class="bmi-value" id="bmiValue">0</div>
+                    <div class="bmi-category" id="bmiCategory">-</div>
+                    <p class="bmi-info" id="bmiInfo">-</p>
+                </div>
+                
+                <table class="bmi-table">
+                    <thead>
+                        <tr>
+                            <th>ค่า BMI</th>
+                            <th>เกณฑ์</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>น้อยกว่า 18.5</td>
+                            <td>น้ำหนักน้อย / ผอม</td>
+                        </tr>
+                        <tr>
+                            <td>18.5 - 22.9</td>
+                            <td>ปกติ (สุขภาพดี)</td>
+                        </tr>
+                        <tr>
+                            <td>23 - 24.9</td>
+                            <td>ท้วม / โรคอ้วนระดับ 1</td>
+                        </tr>
+                        <tr>
+                            <td>25 - 29.9</td>
+                            <td>อ้วน / โรคอ้วนระดับ 2</td>
+                        </tr>
+                        <tr>
+                            <td>มากกว่า 30</td>
+                            <td>อ้วนมาก / โรคอ้วนระดับ 3</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="records-section">
+                <h2 class="section-title">ประวัติการคำนวณ</h2>
+                
+                <div class="records-list" id="recordsList">
+                    <!-- ข้อมูลบันทึกจะแสดงที่นี่ -->
+                </div>
+                
+                <div class="button-group">
+                    <button id="clearAll" class="danger-btn">ลบข้อมูลทั้งหมด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ตัวแปรสำหรับเก็บข้อมูล
+            let records = JSON.parse(localStorage.getItem('bmiRecords')) || [];
+            let editId = null;
+            
+            // อ้างอิงถึง DOM elements
+            const nameInput = document.getElementById('name');
+            const heightInput = document.getElementById('height');
+            const weightInput = document.getElementById('weight');
+            const calculateButton = document.getElementById('calculate');
+            const resetButton = document.getElementById('reset');
+            const clearAllButton = document.getElementById('clearAll');
+            const resultDiv = document.getElementById('result');
+            const bmiValue = document.getElementById('bmiValue');
+            const bmiCategory = document.getElementById('bmiCategory');
+            const bmiInfo = document.getElementById('bmiInfo');
+            const recordsList = document.getElementById('recordsList');
+            
+            // โหลดข้อมูลบันทึกเมื่อหน้าเว็บโหลดเสร็จ
+            loadRecords();
+            
+            // ฟังก์ชันคำนวณ BMI
+            function calculateBMI() {
+                const name = nameInput.value.trim();
+                const height = parseFloat(heightInput.value) / 100; // แปลงเป็นเมตร
+                const weight = parseFloat(weightInput.value);
+                
+                // ตรวจสอบว่ากรอกข้อมูลครบหรือไม่
+                if (!name || !height || !weight) {
+                    alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    return;
+                }
+                
+                // คำนวณ BMI
+                const bmi = weight / (height * height);
+                const roundedBMI = bmi.toFixed(1);
+                
+                // แสดงผลลัพธ์
+                displayResult(roundedBMI);
+                
+                // บันทึกข้อมูล
+                if (editId) {
+                    updateRecord(editId, name, height * 100, weight, roundedBMI);
+                } else {
+                    saveRecord(name, height * 100, weight, roundedBMI);
+                }
+                
+                // โหลดข้อมูลบันทึกใหม่
+                loadRecords();
+            }
+            
+            // ฟังก์ชันแสดงผลลัพธ์
+            function displayResult(bmi) {
+                bmiValue.textContent = bmi;
+                
+                // กำหนดประเภท BMI
+                let category = '';
+                let info = '';
+                let color = '';
+                
+                if (bmi < 18.5) {
+                    category = 'น้ำหนักน้อย / ผอม';
+                    info = 'คุณมีน้ำหนักน้อยกว่าปกติ ซึ่งอาจเกิดจากน้ำหนักน้อยเกินไปหรือได้รับสารอาหารไม่เพียงพอ';
+                    color = '#ff9800';
+                } else if (bmi >= 18.5 && bmi <= 22.9) {
+                    category = 'ปกติ (สุขภาพดี)';
+                    info = 'ยินดีด้วย! คุณมีน้ำหนักอยู่ในเกณฑ์ปกติ ซึ่งดีต่อสุขภาพ';
+                    color = '#4caf50';
+                } else if (bmi >= 23 && bmi <= 24.9) {
+                    category = 'ท้วม / โรคอ้วนระดับ 1';
+                    info = 'คุณมีน้ำหนักเกิน ควรควบคุมอาหารและออกกำลังกาย';
+                    color = '#ff9800';
+                } else if (bmi >= 25 && bmi <= 29.9) {
+                    category = 'อ้วน / โรคอ้วนระดับ 2';
+                    info = 'คุณอยู่ในเกณฑ์อ้วน ควรปรึกษาแพทย์หรือผู้เชี่ยวชาญ';
+                    color = '#f44336';
+                } else {
+                    category = 'อ้วนมาก / โรคอ้วนระดับ 3';
+                    info = 'คุณอยู่ในเกณฑ์อ้วนมาก ควรปรึกษาแพทย์เพื่อรับคำแนะนำ';
+                    color = '#d32f2f';
+                }
+                
+                bmiCategory.textContent = category;
+                bmiInfo.textContent = info;
+                bmiValue.style.color = color;
+                
+                // แสดงผลลัพธ์
+                resultDiv.style.display = 'block';
+            }
+            
+            // ฟังก์ชันบันทึกข้อมูล
+            function saveRecord(name, height, weight, bmi) {
+                const record = {
+                    id: Date.now(),
+                    name: name,
+                    height: height,
+                    weight: weight,
+                    bmi: bmi,
+                    date: new Date().toLocaleString('th-TH')
+                };
+                
+                records.push(record);
+                localStorage.setItem('bmiRecords', JSON.stringify(records));
+                
+                alert('บันทึกข้อมูลเรียบร้อยแล้ว!');
+            }
+            
+            // ฟังก์ชันอัพเดทข้อมูล
+            function updateRecord(id, name, height, weight, bmi) {
+                const index = records.findIndex(record => record.id === id);
+                
+                if (index !== -1) {
+                    records[index].name = name;
+                    records[index].height = height;
+                    records[index].weight = weight;
+                    records[index].bmi = bmi;
+                    records[index].date = new Date().toLocaleString('th-TH');
+                    
+                    localStorage.setItem('bmiRecords', JSON.stringify(records));
+                    editId = null;
+                    
+                    alert('อัพเดทข้อมูลเรียบร้อยแล้ว!');
+                }
+            }
+            
+            // ฟังก์ชันโหลดข้อมูลบันทึก
+            function loadRecords() {
+                recordsList.innerHTML = '';
+                
+                if (records.length === 0) {
+                    recordsList.innerHTML = '<div class="no-records">ยังไม่มีข้อมูลการคำนวณ</div>';
+                    return;
+                }
+                
+                // เรียงลำดับข้อมูลจากล่าสุดไปเก่าสุด
+                const sortedRecords = [...records].sort((a, b) => b.id - a.id);
+                
+                sortedRecords.forEach(record => {
+                    const recordItem = document.createElement('div');
+                    recordItem.className = 'record-item';
+                    
+                    // กำหนดสีตามค่า BMI
+                    let bmiColor = '';
+                    const bmi = parseFloat(record.bmi);
+                    
+                    if (bmi < 18.5) {
+                        bmiColor = '#ff9800';
+                    } else if (bmi >= 18.5 && bmi <= 22.9) {
+                        bmiColor = '#4caf50';
+                    } else if (bmi >= 23 && bmi <= 24.9) {
+                        bmiColor = '#ff9800';
+                    } else if (bmi >= 25 && bmi <= 29.9) {
+                        bmiColor = '#f44336';
+                    } else {
+                        bmiColor = '#d32f2f';
+                    }
+                    
+                    recordItem.innerHTML = `
+                        <div class="record-info">
+                            <div class="record-name">${record.name}</div>
+                            <div class="record-details">
+                                ส่วนสูง: ${record.height} ซม. | น้ำหนัก: ${record.weight} กก. | 
+                                BMI: <span style="color: ${bmiColor}; font-weight: bold;">${record.bmi}</span> | 
+                                วันที่: ${record.date}
+                            </div>
+                        </div>
+                        <div class="record-actions">
+                            <button class="action-btn edit-btn" data-id="${record.id}">แก้ไข</button>
+                            <button class="action-btn delete-btn" data-id="${record.id}">ลบ</button>
+                        </div>
+                    `;
+                    
+                    recordsList.appendChild(recordItem);
+                });
+                
+                // เพิ่ม event listeners สำหรับปุ่มแก้ไขและลบ
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        editRecord(id);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteRecord(id);
+                    });
+                });
+            }
+            
+            // ฟังก์ชันแก้ไขข้อมูล
+            function editRecord(id) {
+                const record = records.find(record => record.id === id);
+                
+                if (record) {
+                    nameInput.value = record.name;
+                    heightInput.value = record.height;
+                    weightInput.value = record.weight;
+                    
+                    editId = id;
+                    
+                    // คำนวณและแสดงผลลัพธ์
+                    const bmi = record.weight / ((record.height / 100) * (record.height / 100));
+                    displayResult(bmi.toFixed(1));
+                    
+                    // เลื่อนไปยังส่วนคำนวณ
+                    document.querySelector('.calculator-section').scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+            
+            // ฟังก์ชันลบข้อมูล
+            function deleteRecord(id) {
+                if (confirm('คุณแน่ใจว่าต้องการลบข้อมูลนี้?')) {
+                    records = records.filter(record => record.id !== id);
+                    localStorage.setItem('bmiRecords', JSON.stringify(records));
+                    loadRecords();
+                }
+            }
+            
+            // ฟังก์ชันรีเซ็ตฟอร์ม
+            function resetForm() {
+                nameInput.value = '';
+                heightInput.value = '';
+                weightInput.value = '';
+                resultDiv.style.display = 'none';
+                editId = null;
+            }
+            
+            // ฟังก์ชันลบข้อมูลทั้งหมด
+            function clearAllRecords() {
+                if (records.length === 0) {
+                    alert('ไม่มีข้อมูลที่จะลบ');
+                    return;
+                }
+                
+                if (confirm('คุณแน่ใจว่าต้องการลบข้อมูลทั้งหมด?')) {
+                    records = [];
+                    localStorage.setItem('bmiRecords', JSON.stringify(records));
+                    loadRecords();
+                }
+            }
+            
+            // เพิ่ม Event Listeners
+            calculateButton.addEventListener('click', calculateBMI);
+            resetButton.addEventListener('click', resetForm);
+            clearAllButton.addEventListener('click', clearAllRecords);
+            
+            // อนุญาตให้กด Enter เพื่อคำนวณ
+            nameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculateBMI();
+                }
+            });
+            
+            heightInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculateBMI();
+                }
+            });
+            
+            weightInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculateBMI();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
